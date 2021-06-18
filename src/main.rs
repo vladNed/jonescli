@@ -1,10 +1,10 @@
 use std::fs;
-mod finder;
+mod extractors;
 
 fn main() {
 
     // TODO: This will become argumens
-    let class_name: &str = "Humans";
+    let class_name: &str = "Human";
     let file_name: &str = "test.py";
 
     // Read the file
@@ -12,9 +12,6 @@ fn main() {
     let lines: Vec<&str> = content.split("\n").collect();
 
     // Generate python class
-    let class = finder::extractors::extract_python_class(lines, class_name);
-    finder::objects::PythonClass::new(class, "Humans".to_string());
-
-    finder::test();
-
+    let class = extractors::extract_python_class(lines, class_name);
+    println!("{}", class)
 }

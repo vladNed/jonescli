@@ -1,6 +1,8 @@
 use super::utils;
 use std::fmt;
 
+#[derive(Debug)]
+#[derive(PartialEq)]
 pub struct Parameter{
     pub name: String,
     pub static_type: String
@@ -22,6 +24,8 @@ impl fmt::Display for Parameter{
     }
 }
 
+#[derive(Debug)]
+#[derive(PartialEq)]
 pub struct Method{
     pub name: String,
     pub parameters: Vec<Parameter>
@@ -43,6 +47,8 @@ impl fmt::Display for Method{
     }
 }
 
+#[derive(Debug)]
+#[derive(PartialEq)]
 pub struct PythonClass{
     pub name: String,
     pub methods: Vec<Method>

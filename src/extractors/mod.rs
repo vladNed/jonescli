@@ -33,3 +33,47 @@ pub fn extract_python_class(code_lines: Vec<&str>, class_name: &str) -> objects:
 
     objects::PythonClass::new(class_code_block, class_name.to_string())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::objects::PythonClass;
+    use super::extract_python_class;
+
+    #[test]
+    fn test_extract_python_class(){
+        let python_file = "
+class Human:
+
+    def __init__(self, name: int):
+        self.name == name
+
+    def hi(self) -> None:
+        print(f'My name is {self.name}')
+
+
+class Kid:
+
+    def __init__(self, age):
+        self.age == age
+
+    def hi(self):
+        print(f'My name is {self.age}')
+";
+        let test_codebase = vec![
+            "class Human:".to_string(),
+            "".to_string(),
+            "    def __init__(self, name: int):".to_string(),
+            "        self.name = name".to_string(),
+            "".to_string(),
+            "    def hi(self):".to_string(),
+            "        print(f'My name is {self.name}')".to_string(),
+            "".to_string()
+        ];
+        let lines: Vec<&str> = python_file.split("\n").collect();
+
+        let expected_class = PythonClass::new(test_codebase, String::from("Human"));
+
+        assert_eq!(extract_python_class(lines, "Human"), expected_class);
+
+    }
+}

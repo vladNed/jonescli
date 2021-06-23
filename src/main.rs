@@ -1,17 +1,14 @@
-use std::fs;
 mod extractors;
 
 fn main() {
 
     // TODO: This will become argumens
-    let class_name: &str = "Human";
-    let file_name: &str = "test.py";
-
-    // Read the file
-    let content = fs::read_to_string(file_name).expect("Something went wrong");
-    let lines: Vec<&str> = content.split("\n").collect();
+    let class_name = String::from("Human");
 
     // Generate python class
-    let class = extractors::extract_python_class(lines, class_name);
-    println!("{}", class)
+    let class = extractors::project_traversal(&"./testsdir".to_string(), &class_name);
+    match class {
+        Some(class) => println!("{:?}", class),
+        None => println!("Found none")
+    }
 }

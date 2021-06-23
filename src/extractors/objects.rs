@@ -12,6 +12,7 @@ impl Parameter {
             static_type
         }
     }
+    
 }
 impl fmt::Display for Parameter{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

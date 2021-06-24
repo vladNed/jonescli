@@ -89,7 +89,7 @@ pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<obje
                     }
                 };
                 let lines: Vec<&str> = file_content.split("\n").collect();
-
+                
                 return Some(extract_python_class(lines, class_name))
             }
         }
@@ -109,7 +109,7 @@ mod tests {
     use std::path::PathBuf;
 
     static PYTHON_CODE: &str = "
-    class Human:
+    class God:
 
         def __init__(self, name: int):
             self.name == name
@@ -118,9 +118,9 @@ mod tests {
             print(f'My name is {self.name}')
 
 
-    class Kid:
+    class TestClass:
 
-        def __init__(self, age):
+        def __init__(self, age: gig):
             self.age == age
 
         def hi(self):
@@ -131,7 +131,7 @@ mod tests {
     fn test_extract_python_class(){
 
         let test_codebase = vec![
-            "class Human:".to_string(),
+            "class God:".to_string(),
             "".to_string(),
             "    def __init__(self, name: int):".to_string(),
             "        self.name = name".to_string(),
@@ -142,9 +142,9 @@ mod tests {
         ];
         let lines: Vec<&str> = PYTHON_CODE.split("\n").collect();
 
-        let expected_class = PythonClass::new(test_codebase, String::from("Human"));
+        let expected_class = PythonClass::new(test_codebase, String::from("God"));
 
-        assert_eq!(extract_python_class(lines, "Human"), expected_class);
+        assert_eq!(extract_python_class(lines, "God"), expected_class);
 
     }
 
@@ -153,13 +153,13 @@ mod tests {
         let path = "./test.py";
         fs::write(path, PYTHON_CODE).unwrap();
 
-        assert_eq!(true, check_file_contains_class("Human", path));
+        assert_eq!(true, check_file_contains_class("God", path));
         fs::remove_file(path).unwrap();
     }
 
     #[test]
     fn test_check_file_contains_class_err() {
-        assert_eq!(check_file_contains_class("Human", "./iogh.py"), false);
+        assert_eq!(check_file_contains_class("God", "./iogh.py"), false);
     }
 
     #[test]
@@ -172,7 +172,7 @@ mod tests {
 
 
         let test_codebase = vec![
-            "class Human:".to_string(),
+            "class God:".to_string(),
             "".to_string(),
             "    def __init__(self, name: int):".to_string(),
             "        self.name = name".to_string(),
@@ -182,8 +182,8 @@ mod tests {
             "".to_string()
         ];
 
-        let expected_class = PythonClass::new(test_codebase, String::from("Human"));
-        assert_eq!(expected_class, project_traversal(&pathbuf, &"Human".to_string()).unwrap());
+        let expected_class = PythonClass::new(test_codebase, String::from("God"));
+        assert_eq!(expected_class, project_traversal(&pathbuf, &"God".to_string()).unwrap());
 
         fs::remove_dir_all("./testing").expect("Could not delete dir");
     }

@@ -46,13 +46,16 @@ pub fn extract_method_name(method_header: &String) -> Result<String, &str> {
 pub fn extract_parameters(header: &String) -> Vec<Parameter> {
 
     // Split to get all the parameter
-    let params_values: Vec<&str> = regex_split(r"(\(|\):|,|\)\s)", true, header);
+    let params_between_parantheses: Vec<&str> = regex_split(r"(\(|\):|\)\s)", true, header);
+    let params: String = params_between_parantheses[1].to_string();
+    let params_values: Vec<&str> = regex_split(r",", true, &params);
     let mut parameters: Vec<Parameter> = Vec::new();
+
     /*
     Starting from the second value, iterate and extract
     all the parameters from the method
     */
-    for parameter in params_values[1..params_values.len()-1].iter(){
+    for parameter in params_values.iter(){
 
         let parameter_string = parameter.to_string();
         if parameter.is_empty() {

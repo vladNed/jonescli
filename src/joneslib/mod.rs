@@ -1,4 +1,5 @@
 use std::fs;
+use std::path::PathBuf;
 
 pub mod utils;
 pub mod objects;
@@ -53,12 +54,14 @@ fn check_file_contains_class(class_name: &str, file_path: &str) -> bool {
         Ok(file_content) => {
             return file_content.contains(&full_class_name)
         },
-        Err(err) => panic!("Could not read file: {}", err)
+        Err(_) => {
+            return false
+        }
     };
 }
 
 /// Searches recurssively through a project for a Python class
-pub fn project_traversal(dir_path: &String, class_name: &String) -> Option<objects::PythonClass> {
+pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<objects::PythonClass> {
     let current_dir = match fs::read_dir(dir_path) {
         Ok(dir) => dir,
         Err(err) => {
@@ -67,13 +70,24 @@ pub fn project_traversal(dir_path: &String, class_name: &String) -> Option<objec
         }
     };
 
-    for file_path in current_dir {
+    'files: for file_path in current_dir {
         let actual_file = file_path.unwrap();
         if actual_file.path().is_dir() {
-            return project_traversal(&actual_file.path().to_str().unwrap().to_string(), class_name)
+            match project_traversal(&actual_file.path(), class_name) {
+                Some(value) => {
+                   return Some(value)
+                },
+                None => continue
+            };
         } else {
             if check_file_contains_class(class_name, &actual_file.path().to_str().unwrap()) {
-                let file_content = fs::read_to_string(actual_file.path()).expect("Could not read file");
+                let file_content = match fs::read_to_string(actual_file.path()) {
+                    Ok(content) => content,
+                    Err(_) => {
+                        println!("Now skipping");
+                        continue 'files
+                    }
+                };
                 let lines: Vec<&str> = file_content.split("\n").collect();
 
                 return Some(extract_python_class(lines, class_name))
@@ -92,6 +106,7 @@ mod tests {
     use super::project_traversal;
     use super::check_file_contains_class;
     use std::fs;
+    use std::path::PathBuf;
 
     static PYTHON_CODE: &str = "
     class Human:
@@ -143,14 +158,15 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn test_check_file_contains_class_err() {
-        check_file_contains_class("Human", "./iogh.py");
+        assert_eq!(check_file_contains_class("Human", "./iogh.py"), false);
     }
 
     #[test]
     fn test_project_traversal() {
         let path = "./testing/test.py";
+        let mut pathbuf = PathBuf::new();
+        pathbuf.push("./testing");
         fs::create_dir("./testing").expect("Could not write dire");
         fs::write(path, PYTHON_CODE).unwrap();
 
@@ -167,7 +183,7 @@ mod tests {
         ];
 
         let expected_class = PythonClass::new(test_codebase, String::from("Human"));
-        assert_eq!(expected_class, project_traversal(&"./testing".to_string(), &"Human".to_string()).unwrap());
+        assert_eq!(expected_class, project_traversal(&pathbuf, &"Human".to_string()).unwrap());
 
         fs::remove_dir_all("./testing").expect("Could not delete dir");
     }

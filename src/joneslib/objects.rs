@@ -49,10 +49,6 @@ impl fmt::Display for Method{
     }
 }
 
-<<<<<<< HEAD:src/extractors/objects.rs
-=======
-
->>>>>>> ef181facc2a923138568e2b4fe27163c6091b575:src/joneslib/objects.rs
 #[derive(Debug)]
 #[derive(PartialEq)]
 pub struct PythonClass{

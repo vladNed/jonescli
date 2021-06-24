@@ -70,7 +70,7 @@ pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<obje
         }
     };
 
-    'files: for file_path in current_dir {
+    for file_path in current_dir {
         let actual_file = file_path.unwrap();
         if actual_file.path().is_dir() {
             match project_traversal(&actual_file.path(), class_name) {
@@ -85,7 +85,7 @@ pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<obje
                     Ok(content) => content,
                     Err(_) => {
                         println!("Now skipping");
-                        continue 'files
+                        continue
                     }
                 };
                 let lines: Vec<&str> = file_content.split("\n").collect();

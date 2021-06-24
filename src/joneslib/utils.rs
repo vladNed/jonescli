@@ -48,7 +48,6 @@ pub fn extract_parameters(header: &String) -> Vec<Parameter> {
     // Split to get all the parameter
     let params_values: Vec<&str> = regex_split(r"(\(|\):|,|\)\s)", true, header);
     let mut parameters: Vec<Parameter> = Vec::new();
-    println!("Methods params {:?}", params_values);
     /*
     Starting from the second value, iterate and extract
     all the parameters from the method
@@ -56,7 +55,7 @@ pub fn extract_parameters(header: &String) -> Vec<Parameter> {
     for parameter in params_values[1..params_values.len()-1].iter(){
 
         let parameter_string = parameter.to_string();
-        if parameter_string.is_empty() {
+        if parameter.is_empty() {
             continue
         }
 
@@ -100,6 +99,8 @@ pub fn extract_methods(class_code: Vec<String>) -> Vec<Method> {
     }
     methods
 }
+
+
 
 #[cfg(test)]
 mod tests {

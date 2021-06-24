@@ -1,5 +1,6 @@
 use super::utils;
 use std::fmt;
+use ansi_term::Colour;
 
 #[derive(Debug)]
 #[derive(PartialEq)]
@@ -14,12 +15,13 @@ impl Parameter {
             static_type
         }
     }
+
 }
 impl fmt::Display for Parameter{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[{}: {}]",
-            &self.name,
-            &self.static_type
+        write!(f, "  * [{}: {}]",
+            Colour::Purple.paint(&self.name),
+            Colour::Green.paint(&self.static_type)
         )
     }
 }
@@ -40,13 +42,17 @@ impl Method {
 }
 impl fmt::Display for Method{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Method :: {} -> {}",
-            &self.name,
-            &self.parameters[0]
+        write!(f, ":: {} -> {}",
+            Colour::Yellow.paint(&self.name),
+            Colour::Cyan.paint("type")
         )
     }
 }
 
+<<<<<<< HEAD:src/extractors/objects.rs
+=======
+
+>>>>>>> ef181facc2a923138568e2b4fe27163c6091b575:src/joneslib/objects.rs
 #[derive(Debug)]
 #[derive(PartialEq)]
 pub struct PythonClass{
@@ -63,9 +69,8 @@ impl PythonClass {
 }
 impl fmt::Display for PythonClass{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Class :: {}\n\n{}",
-            &self.name,
-            &self.methods[1]
+        write!(f, "# Class :: {}\n\n# Methods\n-------",
+            Colour::Cyan.paint(&self.name),
         )
     }
 }

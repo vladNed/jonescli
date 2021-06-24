@@ -30,12 +30,12 @@ fn regex_split<'a>(r: &'a str, trim: bool, value: &'a String) -> Vec<&'a str> {
 /// def method_name(self, arg1: int, arg2: str) -> None:
 /// ```
 /// Extracted name here is `method_name`
-pub fn extract_method_name(method_header: &String) -> String {
+pub fn extract_method_name(method_header: &String) -> Result<String, &str> {
     let split_header = regex_split(r"\W", true, method_header);
     if split_header[0].trim() != FUNCTION_KEYWORD.trim() {
-        panic!("This is not a method header")
+        return Err("This is not a method header")
     }
-    split_header[1].to_string()
+    Ok(split_header[1].to_string())
 }
 
 /// Extract method parameters with their static type
@@ -100,6 +100,29 @@ pub fn extract_methods(class_code: Vec<String>) -> Vec<Method> {
     methods
 }
 
+/// Extract method output after the poiting arrow
+///
+/// # Arguments
+///
+/// * `header` - Python method header
+///
+/// # Output
+///
+/// * `Err` - if the header had no type and at split nothing happened
+/// * `Ok` - returns header type
+pub fn extract_method_output(header: &String) -> Result<String, &str> {
+    let header_split = regex_split(r"( -> )", true, header);
+    match header_split.len() {
+        1 => {
+            return Err("Output type not found")
+        },
+        _ => {
+            let cleaned_output = header_split[1].trim().replace(":", "");
+            return Ok(cleaned_output)
+        }
+    }
+}
+
 
 
 #[cfg(test)]
@@ -131,14 +154,13 @@ mod tests {
         let test_string = String::from("def this_name(self, param2: int) -> None:");
         let expected = String::from("this_name");
 
-        assert_eq!(extract_method_name(&test_string), expected);
+        assert_eq!(extract_method_name(&test_string).unwrap(), expected);
     }
 
     #[test]
-    #[should_panic(expected="This is not a method header")]
     fn test_extract_method_name_negative(){
         let test_string = String::from("import definition as positive");
-        extract_method_name(&test_string);
+        assert!(extract_method_name(&test_string).is_err());
     }
 
     #[test]
@@ -189,5 +211,13 @@ mod tests {
         ];
 
         assert_eq!(extract_methods(test_codebase), expected_methods);
+    }
+
+    #[test]
+    fn test_extract_method_output() {
+        let test_string = String::from("def this_name(self, param2: int) -> List[int]:");
+        let expected = String::from("List[int]");
+
+        assert_eq!(extract_method_output(&test_string).unwrap(), expected);
     }
 }

@@ -30,12 +30,25 @@ impl fmt::Display for Parameter{
 #[derive(PartialEq)]
 pub struct Method{
     pub name: String,
-    pub parameters: Vec<Parameter>
+    pub parameters: Vec<Parameter>,
+    pub output: String
 }
 impl Method {
     pub fn new(method_header: &String) -> Self {
+        let method_name = match utils::extract_method_name(method_header) {
+            Ok(name) => name,
+            Err(err) => {
+                println!("Error while extracting method name: {}", err);
+                String::from("ENL")
+            }
+        };
+        let method_output = match utils::extract_method_output(method_header) {
+            Ok(output) => output,
+            Err(_) => String::from("None")
+        };
         Method {
-            name: utils::extract_method_name(method_header),
+            name: method_name,
+            output: method_output,
             parameters: utils::extract_parameters(method_header)
         }
     }
@@ -44,7 +57,7 @@ impl fmt::Display for Method{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, ":: {} -> {}",
             Colour::Yellow.paint(&self.name),
-            Colour::Cyan.paint("type")
+            Colour::Cyan.paint(&self.output)
         )
     }
 }

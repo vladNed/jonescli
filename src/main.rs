@@ -1,4 +1,4 @@
-mod extractors;
+mod joneslib;
 
 fn main() {
 
@@ -6,9 +6,11 @@ fn main() {
     let class_name = String::from("Human");
 
     // Generate python class
-    let class = extractors::project_traversal(&"./testsdir".to_string(), &class_name);
+    let class = joneslib::project_traversal(&"./testdir".to_string(), &class_name);
     match class {
-        Some(class) => println!("{:?}", class),
+        Some(class) => joneslib::display::output_class(&class),
         None => println!("Found none")
     }
+
 }
+

@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 regex = "1.5.4"
+ansi_term = "0.12.1"

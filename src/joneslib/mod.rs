@@ -2,6 +2,7 @@ use std::fs;
 
 pub mod utils;
 pub mod objects;
+pub mod display;
 
 static CLASS_KEYWORD: &str = "class {template}";
 static TEMPLATE_KEYWORD: &str = "{template}";
@@ -81,6 +82,8 @@ pub fn project_traversal(dir_path: &String, class_name: &String) -> Option<objec
     }
     return None
 }
+
+
 
 #[cfg(test)]
 mod tests {

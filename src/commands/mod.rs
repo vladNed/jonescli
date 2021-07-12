@@ -1,24 +1,20 @@
 use std::path::PathBuf;
-use std::env::current_dir;
+use structopt::StructOpt;
 
-/// Configuration struct for managing input arguments to console
-pub struct Config {
+#[derive(StructOpt)]
+pub struct CLI {
+
+    // Flag to search all classes with that value
+    #[structopt(short="g", long="grep",
+        help="Used to retrieve all classes with that pattern")]
+    pub grep: bool,
+
+    // Class name to be fetched
+    #[structopt(help="Name of the Python class")]
     pub class_name: String,
-    pub dir_path: PathBuf
-}
-impl Config {
-    pub fn new(args: &Vec<String>) -> Result<Config, &str> {
-        if args.len() < 2 {
-            return Err("Class name query was not given")
-        }
-        let class_name = args[1].clone();
-        let dir_path = match current_dir() {
-            Ok(dir) => dir,
-            Err(_) => {
-                return Err("Could not read current directory path")
-            }
-        };
 
-        Ok(Config {class_name, dir_path})
-    }
+    // Search directory
+    #[structopt(parse(from_os_str), default_value=".",
+        help="Search directory")]
+    pub dir_path: PathBuf
 }

@@ -1,23 +1,15 @@
-use std::env;
-use std::process;
 use ansi_term::Colour;
+use structopt::StructOpt;
+
 
 mod joneslib;
 mod commands;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let coms = commands::Config::new(&args).unwrap_or_else(|err| {
-        println!(
-            "{}: {}",
-            Colour::Red.paint("ARGS ERROR"),
-            Colour::Yellow.paint(err)
-        );
-        process::exit(1);
-    });
+    let comms = commands::CLI::from_args();
 
     // Generate python class
-    let class = joneslib::project_traversal(&coms.dir_path, &coms.class_name);
+    let class = joneslib::project_traversal(&comms.dir_path, &comms.class_name);
     match class {
         Some(class) => joneslib::display::output_class(&class),
         None => println!(
@@ -26,6 +18,7 @@ fn main() {
             Colour::Yellow.paint("Searched class was not found in project")
         )
     }
+
 
 }
 

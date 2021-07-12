@@ -19,7 +19,7 @@ impl Parameter {
 }
 impl fmt::Display for Parameter{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "  * [{}: {}]",
+        write!(f, "  * {}: {}",
             Colour::Purple.paint(&self.name),
             Colour::Green.paint(&self.static_type)
         )
@@ -55,7 +55,7 @@ impl Method {
 }
 impl fmt::Display for Method{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, ":: {} -> {}",
+        write!(f, ":: [{}] -> {}",
             Colour::Yellow.paint(&self.name),
             Colour::Cyan.paint(&self.output)
         )
@@ -78,7 +78,7 @@ impl PythonClass {
 }
 impl fmt::Display for PythonClass{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "# Class :: {}\n\n# Methods\n-------",
+        write!(f, "# Class :: [{}]\n\n# Methods\n-------",
             Colour::Cyan.paint(&self.name),
         )
     }

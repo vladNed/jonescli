@@ -1,7 +1,6 @@
 use ansi_term::Colour;
 use structopt::StructOpt;
 
-
 mod joneslib;
 mod commands;
 

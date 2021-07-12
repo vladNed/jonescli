@@ -3,6 +3,7 @@ use super::objects::{Parameter, Method};
 
 static FUNCTION_KEYWORD: &str = " def ";
 static DEFAULT_TYPE: &str = "None";
+static ENDEF_KEYWORD: char = ':';
 
 /// Simple regex split on a given code line
 /// # Arguments
@@ -94,10 +95,30 @@ pub fn extract_parameters(header: &String) -> Vec<Parameter> {
 /// * `class_code` - The code for the Python class extracted from the
 /// .py file
 pub fn extract_methods(class_code: Vec<String>) -> Vec<Method> {
+
+    // Initialize temp method and start for retrieving method headers
+    // that span on multiple lines
     let mut methods: Vec<Method> = Vec::new();
+    let mut temp_method = String::from("");
+    let mut start = false;
+
     for line in class_code.iter() {
-        if line.contains(FUNCTION_KEYWORD) {
-            methods.push(Method::new(line))
+        if !start && line.contains(FUNCTION_KEYWORD) {
+            start = true;
+        }
+        if start {
+            temp_method.push_str(line.trim());
+            let last_char = match temp_method.chars()
+                .nth(temp_method.len() - 1) {
+                    Some(chr) => chr,
+                    None => continue
+                };
+
+            if last_char == ENDEF_KEYWORD {
+                methods.push(Method::new(&temp_method));
+                temp_method = String::from("");
+                start = false;
+            }
         }
     }
     methods
@@ -210,6 +231,29 @@ mod tests {
 
         let expected_methods = vec![
             Method::new(&"    def __init__(self, name):".to_string()),
+            Method::new(&"    def say_hi(self):".to_string()),
+        ];
+
+        assert_eq!(extract_methods(test_codebase), expected_methods);
+    }
+
+    #[test]
+    fn test_extract_methods_multiple_lines(){
+        let test_codebase = vec![
+            "class Test:".to_string(),
+            "".to_string(),
+            "    def __init__(self, name: int,".to_string(),
+            "                 param1: str,".to_string(),
+            "                 param2: int) -> str:".to_string(),
+            "        self.name = name".to_string(),
+            "".to_string(),
+            "    def say_hi(self):".to_string(),
+            "        self.name = name".to_string(),
+            "".to_string()
+        ];
+
+        let expected_methods = vec![
+            Method::new(&"    def __init__(self, name: int, param1: str, param2: int) -> str:".to_string()),
             Method::new(&"    def say_hi(self):".to_string()),
         ];
 

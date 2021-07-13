@@ -2,7 +2,6 @@ use super::objects;
 use super::ClassMatch;
 use ansi_term::Colour;
 
-
 pub fn output_class(python_class: &objects::PythonClass) {
     println!("{}", python_class);
 
@@ -27,7 +26,7 @@ pub fn class_matches(found_match_classes: Vec<ClassMatch>) -> () {
     for line in found_match_classes.iter() {
         println!(
             ":: {} -> {}",
-            Colour::Yellow.paint(&line.0),
+            Colour::Yellow.paint(&line.0.replace("\r", "")),
             Colour::Purple.paint(&line.1)
         )
     }

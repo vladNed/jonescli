@@ -161,7 +161,7 @@ pub fn extract_method_output(header: &String) -> Result<String, &str> {
 pub fn grep_class<'a>(lines: Vec<&str>, keyword: &String, file_name: &str) -> Option<Vec<(String, String)>> {
     let mut found_match_classes: Vec<(String, String)> = Vec::new();
     for line in lines.iter() {
-        if line.contains(CLASS_KEYWORD) && line.contains(keyword) {
+        if line.trim().starts_with(CLASS_KEYWORD) && line.contains(keyword) {
             found_match_classes.push(
                 (line.to_string(), file_name.to_string())
             );

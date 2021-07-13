@@ -1,12 +1,15 @@
-use std::fs;
-use std::path::PathBuf;
-
 pub mod utils;
 pub mod objects;
 pub mod display;
 
+use std::fs;
+use std::path::PathBuf;
+
 static CLASS_KEYWORD: &str = "class {template}";
 static TEMPLATE_KEYWORD: &str = "{template}";
+
+type ClassMatch = (String, String);
+
 
 /// Extracts the searched python class from the code
 ///
@@ -89,7 +92,7 @@ pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<obje
                     }
                 };
                 let lines: Vec<&str> = file_content.split("\n").collect();
-                
+
                 return Some(extract_python_class(lines, class_name))
             }
         }
@@ -97,6 +100,44 @@ pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<obje
     return None
 }
 
+
+pub fn smart_search(dir_path: &PathBuf, class_name: &String)  -> Option<Vec<ClassMatch>>{
+    let mut found_matched_classes: Vec<ClassMatch> = Vec::new();
+
+    let current_dir = match fs::read_dir(dir_path) {
+        Ok(dir) => dir,
+        Err(err) => {
+            println!("Error occured while reading dir: {}", err);
+            return None
+        }
+    };
+
+    for file_path in current_dir {
+        let file = file_path.unwrap();
+        if file.path().is_dir() {
+            match smart_search(&file.path(), class_name) {
+                Some(matches) => found_matched_classes.extend(matches),
+                None => continue
+            };
+        } else {
+            let file_content = match fs::read_to_string(file.path()) {
+                Ok(content) => content,
+                Err(_) => return None
+            };
+            let lines: Vec<&str> = file_content.split("\n").collect();
+            match utils::grep_class(lines, &class_name, file.path().to_str().unwrap()) {
+                Some(matches) => found_matched_classes.extend(matches),
+                None => continue
+            }
+        }
+    }
+
+    if found_matched_classes.len() > 0 {
+        Some(found_matched_classes)
+    } else {
+        None
+    }
+}
 
 
 #[cfg(test)]

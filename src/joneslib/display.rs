@@ -2,7 +2,6 @@ use super::objects;
 use super::ClassMatch;
 use ansi_term::Colour;
 
-
 pub fn output_class(python_class: &objects::PythonClass) {
     println!("{}", python_class);
 

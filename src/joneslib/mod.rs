@@ -100,7 +100,7 @@ pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<obje
     return None
 }
 
-
+/// Project traversal recursive and searches for a keyword based on itself or on context (Phase 2)
 pub fn smart_search(dir_path: &PathBuf, class_name: &String)  -> Option<Vec<ClassMatch>>{
     let mut found_matched_classes: Vec<ClassMatch> = Vec::new();
 
@@ -122,7 +122,7 @@ pub fn smart_search(dir_path: &PathBuf, class_name: &String)  -> Option<Vec<Clas
         } else {
             let file_content = match fs::read_to_string(file.path()) {
                 Ok(content) => content,
-                Err(_) => return None
+                Err(_) => continue
             };
             let lines: Vec<&str> = file_content.split("\n").collect();
             match utils::grep_class(lines, &class_name, file.path().to_str().unwrap()) {

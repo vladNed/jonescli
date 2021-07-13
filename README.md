@@ -4,7 +4,7 @@
 
 # Context
 
-> Note: This is a first attempt to Rust programming.
+> Note: 🌶 This is a first attempt to Rust programming.
 
 This project is a pathfinder/inspector for Python classes. A very minimal implementation of a CLI tool that helps you find Python classes.
 It aims to help you find classes without changing files or view to understand classes and it shows you the methods and arguments of it very
@@ -12,10 +12,10 @@ beautiful in the terminal
 
 # Usage
 
-Obviously for better understanding of jones capabilities you can always type:
+Obviously for better understanding of `jones` capabilities you can always type:
 
 ```bash
-& jones --help
+$ jones --help
 ```
 
 This will show you all the flags and arguments that jones has
@@ -32,7 +32,7 @@ $ jones -g Tool
 ```
 This would return all classes that contain the Tool word and would show you in which files are found exactly as the usual grep.
 
-```bash
+```
 > [FOUND MATCHES]
 :: class Tool: -> ~/project/src/band.py
 :: class ToolMind: -> ~/project/src/golden_ratio.py

@@ -4,6 +4,7 @@ use super::objects::{Parameter, Method};
 static FUNCTION_KEYWORD: &str = " def ";
 static DEFAULT_TYPE: &str = "None";
 static ENDEF_KEYWORD: char = ':';
+static CLASS_KEYWORD: &str = "class ";
 
 /// Simple regex split on a given code line
 /// # Arguments
@@ -147,6 +148,32 @@ pub fn extract_method_output(header: &String) -> Result<String, &str> {
     }
 }
 
+/// Search & find all Python classes that contain the keyword or are relevant to the context
+///
+/// # Arguments
+///
+/// * `lines` - The python file code lines previously read
+/// * `keyword` - The class name given for the search
+///
+/// # Output
+///
+/// * `Option<Vec<String, String>>` - containing all the found relevant classes
+pub fn grep_class<'a>(lines: Vec<&str>, keyword: &String, file_name: &str) -> Option<Vec<(String, String)>> {
+    let mut found_match_classes: Vec<(String, String)> = Vec::new();
+    for line in lines.iter() {
+        if line.contains(CLASS_KEYWORD) && line.contains(keyword) {
+            found_match_classes.push(
+                (line.to_string(), file_name.to_string())
+            );
+        }
+    }
+    if found_match_classes.len() > 0 {
+        Some(found_match_classes)
+    } else {
+        None
+    }
+}
+
 
 
 #[cfg(test)]
@@ -266,5 +293,52 @@ mod tests {
         let expected = String::from("List[int]");
 
         assert_eq!(extract_method_output(&test_string).unwrap(), expected);
+    }
+
+    #[test]
+    fn test_grep_class_some() {
+        let test_codebase = vec![
+            "class God:",
+            "",
+            "    def __init__(self, name):",
+            "        self.name = name",
+            "",
+            "class GodMode:",
+            "",
+            "    def __init__(self, name):",
+            "        self.name = name",
+            "",
+        ];
+
+        let keyword = String::from("God");
+        let filename = "./testing";
+        let expected = vec![
+            (String::from("class God:"), filename.to_string()),
+            (String::from("class GodMode:"), filename.to_string()),
+        ];
+
+        assert_eq!(grep_class(test_codebase, &keyword, filename).unwrap(), expected);
+    }
+
+    #[test]
+    fn test_grep_class_none() {
+        let test_codebase = vec![
+            "class God:",
+            "",
+            "    def __init__(self, name):",
+            "        self.name = name",
+            "",
+            "class GodMode:",
+            "",
+            "    def __init__(self, name):",
+            "        self.name = name",
+            "",
+        ];
+
+        let keyword = String::from("Zeus");
+        let filename = "./testing";
+
+
+        assert_eq!(grep_class(test_codebase, &keyword, filename), None);
     }
 }

@@ -7,6 +7,7 @@ use std::path::PathBuf;
 
 static CLASS_KEYWORD: &str = "class {template}";
 static TEMPLATE_KEYWORD: &str = "{template}";
+static PYTHON_EXTENSION: &str = "py";
 
 type ClassMatch = (String, String);
 
@@ -73,18 +74,27 @@ pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<obje
         }
     };
 
-    for file_path in current_dir {
-        let actual_file = file_path.unwrap();
-        if actual_file.path().is_dir() {
-            match project_traversal(&actual_file.path(), class_name) {
+    for file in current_dir {
+        let file_path = file.unwrap().path();
+        let file_path_name = file_path.to_str().unwrap();
+        if file_path.is_dir() {
+            match project_traversal(&file_path, class_name) {
                 Some(value) => {
                    return Some(value)
                 },
                 None => continue
             };
         } else {
-            if check_file_contains_class(class_name, &actual_file.path().to_str().unwrap()) {
-                let file_content = match fs::read_to_string(actual_file.path()) {
+            match file_path.extension() {
+                Some(extension) => {
+                    if extension != PYTHON_EXTENSION {
+                        continue
+                    }
+                },
+                None => continue
+            };
+            if check_file_contains_class(class_name, &file_path_name){
+                let file_content = match fs::read_to_string(file_path) {
                     Ok(content) => content,
                     Err(_) => {
                         println!("Now skipping");
@@ -112,20 +122,29 @@ pub fn smart_search(dir_path: &PathBuf, class_name: &String)  -> Option<Vec<Clas
         }
     };
 
-    for file_path in current_dir {
-        let file = file_path.unwrap();
-        if file.path().is_dir() {
-            match smart_search(&file.path(), class_name) {
+    for file in current_dir {
+        let file_path = file.unwrap().path();
+        let file_path_name = file_path.to_str().unwrap();
+        if file_path.is_dir() {
+            match smart_search(&file_path, class_name) {
                 Some(matches) => found_matched_classes.extend(matches),
                 None => continue
             };
         } else {
-            let file_content = match fs::read_to_string(file.path()) {
+            match file_path.extension() {
+                Some(extension) => {
+                    if extension != PYTHON_EXTENSION {
+                        continue
+                    }
+                },
+                None => continue
+            };
+            let file_content = match fs::read_to_string(&file_path) {
                 Ok(content) => content,
                 Err(_) => continue
             };
             let lines: Vec<&str> = file_content.split("\n").collect();
-            match utils::grep_class(lines, &class_name, file.path().to_str().unwrap()) {
+            match utils::grep_class(lines, &class_name, file_path_name) {
                 Some(matches) => found_matched_classes.extend(matches),
                 None => continue
             }
@@ -158,7 +177,8 @@ mod tests {
         def hi(self) -> None:
             print(f'My name is {self.name}')
 
-
+    ";
+    static RANDOM_CODE: &str = "
     class TestClass:
 
         def __init__(self, age: gig):
@@ -227,5 +247,27 @@ mod tests {
         assert_eq!(expected_class, project_traversal(&pathbuf, &"God".to_string()).unwrap());
 
         fs::remove_dir_all("./testing").expect("Could not delete dir");
+    }
+
+    #[test]
+    fn test_process_only_py_files() {
+
+        // Paths
+        let test_dir = String::from("./testing_none");
+        let python_file = String::from("./testing_none/test.py");
+        let random_file = String::from("./testing_none/test.rs");
+        let mut pathbuf = PathBuf::new();
+
+        // Create dir and files
+        fs::create_dir(test_dir).expect("Could not write dir");
+        fs::write(python_file, PYTHON_CODE).unwrap();
+        fs::write(random_file, RANDOM_CODE).unwrap();
+        pathbuf.push("./testing_none");
+
+        // Assert
+        assert_eq!( project_traversal(&pathbuf, &"TestCode".to_string()), None);
+
+        // Destroy the test dir
+        fs::remove_dir_all("./testing_none").expect("Could not delete dir");
     }
 }

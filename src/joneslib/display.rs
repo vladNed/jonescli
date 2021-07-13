@@ -26,7 +26,7 @@ pub fn class_matches(found_match_classes: Vec<ClassMatch>) -> () {
     for line in found_match_classes.iter() {
         println!(
             ":: {} -> {}",
-            Colour::Yellow.paint(&line.0),
+            Colour::Yellow.paint(&line.0.replace("\r", "")),
             Colour::Purple.paint(&line.1)
         )
     }

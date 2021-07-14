@@ -1,3 +1,12 @@
+/*
+JonesCLI
+
+Author: Vlad Nedelcu
+Date: Jul 2021
+License: MIT
+
+Copyright 2021 Vlad Nedelcu
+*/
 use super::objects;
 use super::ClassMatch;
 use ansi_term::Colour;

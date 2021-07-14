@@ -1,3 +1,13 @@
+/*
+JonesCLI
+
+Author: Vlad Nedelcu
+Date: Jul 2021
+License: MIT
+
+Copyright 2021 Vlad Nedelcu
+*/
+
 pub mod utils;
 pub mod objects;
 pub mod display;

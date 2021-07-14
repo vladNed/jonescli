@@ -1,6 +1,9 @@
-use super::utils;
-use std::fmt;
 use ansi_term::Colour;
+use std::fmt;
+use super::extract_method_name;
+use super::extract_method_output;
+use super::extract_parameters;
+use super::extract_methods;
 
 #[derive(Debug)]
 #[derive(PartialEq)]
@@ -35,21 +38,21 @@ pub struct Method{
 }
 impl Method {
     pub fn new(method_header: &String) -> Self {
-        let method_name = match utils::extract_method_name(method_header) {
+        let method_name = match extract_method_name(method_header) {
             Ok(name) => name,
             Err(err) => {
                 println!("Error while extracting method name: {}", err);
                 String::from("ENL")
             }
         };
-        let method_output = match utils::extract_method_output(method_header) {
+        let method_output = match extract_method_output(method_header) {
             Ok(output) => output,
             Err(_) => String::from("None")
         };
         Method {
             name: method_name,
             output: method_output,
-            parameters: utils::extract_parameters(method_header)
+            parameters: extract_parameters(method_header)
         }
     }
 }
@@ -73,7 +76,7 @@ impl PythonClass {
     pub fn new(class_code: Vec<String>, name: String, inheritance: Vec<String>) -> Self {
         PythonClass {
             name: name,
-            methods: utils::extract_methods(class_code),
+            methods: extract_methods(class_code),
             inheritance
         }
     }

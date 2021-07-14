@@ -26,10 +26,12 @@ fn extract_python_class(code_lines: Vec<&str>, class_name: &str) -> objects::Pyt
 
     let mut start_cutting: bool = false;
     let mut class_code_block: Vec<String> = Vec::new();
+    let mut class_header: String = String::from("");
 
     for (counter, line) in code_lines.iter().enumerate() {
         if line.contains(&full_class_name) {
             start_cutting = true;
+            class_header.push_str(line)
         }
         if start_cutting {
             class_code_block.push(line.to_string());
@@ -39,7 +41,12 @@ fn extract_python_class(code_lines: Vec<&str>, class_name: &str) -> objects::Pyt
         }
     }
 
-    objects::PythonClass::new(class_code_block, class_name.to_string())
+    let class_inheritance = match utils::extract_class_inheritance(&class_header) {
+        Some(inheritance_vec) => inheritance_vec,
+        None => Vec::new()
+    };
+
+    objects::PythonClass::new(class_code_block, class_name.to_string(), class_inheritance)
 }
 
 /// Check if a file contains the searched class by reading the file.
@@ -203,7 +210,7 @@ mod tests {
         ];
         let lines: Vec<&str> = PYTHON_CODE.split("\n").collect();
 
-        let expected_class = PythonClass::new(test_codebase, String::from("God"));
+        let expected_class = PythonClass::new(test_codebase, String::from("God"), Vec::new());
 
         assert_eq!(extract_python_class(lines, "God"), expected_class);
 
@@ -243,7 +250,7 @@ mod tests {
             "".to_string()
         ];
 
-        let expected_class = PythonClass::new(test_codebase, String::from("God"));
+        let expected_class = PythonClass::new(test_codebase, String::from("God"), Vec::new());
         assert_eq!(expected_class, project_traversal(&pathbuf, &"God".to_string()).unwrap());
 
         fs::remove_dir_all("./testing").expect("Could not delete dir");

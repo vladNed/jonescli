@@ -1,6 +1,7 @@
 # Jones CLI
 
 [![pipeline-jones](https://github.com/Fremen-Solutions/jonescli/actions/workflows/pipeline-jones.yml/badge.svg)](https://github.com/Fremen-Solutions/jonescli/actions/workflows/pipeline-jones.yml)
+![Crates.io](https://img.shields.io/crates/v/jones)
 
 # Context
 

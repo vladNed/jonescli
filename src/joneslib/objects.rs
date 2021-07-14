@@ -66,20 +66,30 @@ impl fmt::Display for Method{
 #[derive(PartialEq)]
 pub struct PythonClass{
     pub name: String,
-    pub methods: Vec<Method>
+    pub methods: Vec<Method>,
+    pub inheritance: Vec<String>
 }
 impl PythonClass {
-    pub fn new(class_code: Vec<String>, name: String) -> Self {
+    pub fn new(class_code: Vec<String>, name: String, inheritance: Vec<String>) -> Self {
         PythonClass {
             name: name,
-            methods: utils::extract_methods(class_code)
+            methods: utils::extract_methods(class_code),
+            inheritance
         }
     }
 }
 impl fmt::Display for PythonClass{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "# Class :: [{}]\n\n# Methods\n-------",
+        let mut inheritance_display = String::from("");
+        inheritance_display.push_str("[");
+        for object in self.inheritance.iter() {
+            inheritance_display.push_str(object);
+            inheritance_display.push_str(", ");
+        }
+        inheritance_display.push_str("]");
+        write!(f, "# Class :: [{}]\n* inherit -> {}\n\n# Methods\n-------",
             Colour::Cyan.paint(&self.name),
+            Colour::Green.paint(inheritance_display)
         )
     }
 }

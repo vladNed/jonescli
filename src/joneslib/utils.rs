@@ -175,6 +175,36 @@ pub fn grep_class<'a>(lines: Vec<&str>, keyword: &String, file_name: &str) -> Op
 }
 
 
+/// Extract class inheritance objects
+///
+/// > Note: Does not include extracting filters or constraints
+///
+/// # Arguments
+///
+/// * `line` - Is the class header previously extracted
+///
+/// # Output
+///
+/// A vector containing all the objects the class inherits
+pub fn extract_class_inheritance(line: &String) -> Option<Vec<String>> {
+
+    // Split the header for now to get objects that are inherited by the class
+    let class_header_split: Vec<&str> = regex_split(r"(\(|\):|,)", true, line);
+    if class_header_split.len() == 1 {
+        return None
+    }
+
+    // Iterate through the split results but ommit the first entry
+    let mut class_inheritance: Vec<String> = Vec::new();
+    for inheritance in class_header_split[1..class_header_split.len()-1].iter(){
+        let inherit_object = inheritance.trim().to_string();
+        class_inheritance.push(inherit_object);
+    }
+
+    Some(class_inheritance)
+}
+
+
 
 #[cfg(test)]
 mod tests {
@@ -340,5 +370,20 @@ mod tests {
 
 
         assert_eq!(grep_class(test_codebase, &keyword, filename), None);
+    }
+
+    #[test]
+    fn test_extract_class_inheritance() {
+        let test_header = String::from("class Human(Being, Earthling):");
+        let expected = vec![String::from("Being"), String::from("Earthling")];
+
+        assert_eq!(extract_class_inheritance(&test_header), Some(expected));
+    }
+
+    #[test]
+    fn test_extract_no_inheritance(){
+        let test_header = String::from("class Human:");
+
+        assert_eq!(extract_class_inheritance(&test_header), None);
     }
 }

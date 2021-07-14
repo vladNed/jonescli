@@ -1,0 +1,16 @@
+[package]
+name = "prospector"
+version = "0.1.0"
+authors = ["Vlad Nedelcu <vlad.nedelcu@evozon.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+regex = "1.5.4"
+ansi_term = "0.12.1"
+
+[lib]
+name = "prospector"
+path = "src/lib.rs"
+ansi_term = "0.12.1"

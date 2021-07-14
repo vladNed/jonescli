@@ -1,8 +1,8 @@
-use super::objects;
+use prospector::objects::PythonClass;
 use super::ClassMatch;
 use ansi_term::Colour;
 
-pub fn output_class(python_class: &objects::PythonClass) {
+pub fn output_class(python_class: &PythonClass) {
     println!("{}", python_class);
 
     for method in python_class.methods.iter() {

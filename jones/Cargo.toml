@@ -4,6 +4,10 @@ version = "0.1.1"
 authors = ["Vlad Nedelcu <vlad.nedelcu@evozon.com>"]
 license = "MIT"
 edition = "2018"
+description = "CLI project for searching and inspecting Python classes"
+readme = "README.md"
+keywords = ["cli", "search", "inspector", "finder", "python-doc"]
+categories = ["command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

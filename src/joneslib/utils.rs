@@ -9,7 +9,13 @@ Copyright 2021 Vlad Nedelcu
 */
 
 use regex::Regex;
-use super::objects::{Parameter, Method};
+use super::{
+    objects::{
+        Parameter,
+        Method
+    },
+    markers::get_header_arguments
+};
 
 static FUNCTION_KEYWORD: &str = " def ";
 static DEFAULT_TYPE: &str = "None";
@@ -58,23 +64,21 @@ pub fn extract_method_name(method_header: &String) -> Result<String, &str> {
 pub fn extract_parameters(header: &String) -> Vec<Parameter> {
 
     // Split to get all the parameter
-    let params_between_parantheses: Vec<&str> = regex_split(r"(\(|\):|\)\s)", true, header);
-    let params: String = params_between_parantheses[1].to_string();
-    let params_values: Vec<&str> = regex_split(r",", true, &params);
+    let parameter_segment: String = match get_header_arguments(header) {
+        Some(params) => params,
+        None => return Vec::new()
+    };
+    let parameters_values = regex_split(r",\s", true, &parameter_segment);
     let mut parameters: Vec<Parameter> = Vec::new();
 
     /*
     Starting from the second value, iterate and extract
     all the parameters from the method
     */
-    for parameter in params_values.iter(){
+    for param in parameters_values.iter(){
 
-        let parameter_string = parameter.to_string();
-        if parameter.is_empty() {
-            continue
-        }
-
-        let param_values: Vec<&str> = regex_split(r":\s", false, &parameter_string);
+        let param_string = param.to_string();
+        let param_values: Vec<&str> = regex_split(r":\s", false, &param_string);
         match param_values.len() {
             1 => {
                 parameters.push(
@@ -92,7 +96,7 @@ pub fn extract_parameters(header: &String) -> Vec<Parameter> {
                     )
                 )
             },
-            _ => println!("Found method in code with no parameters.")
+            _ => println!("Found method in code with no parameters. {:?}", param_values)
         }
 
     }
@@ -110,7 +114,7 @@ pub fn extract_methods(class_code: Vec<String>) -> Vec<Method> {
     // Initialize temp method and start for retrieving method headers
     // that span on multiple lines
     let mut methods: Vec<Method> = Vec::new();
-    let mut temp_method = String::from("");
+    let mut temp_method = String::new();
     let mut start = false;
 
     for line in class_code.iter() {
@@ -118,7 +122,7 @@ pub fn extract_methods(class_code: Vec<String>) -> Vec<Method> {
             start = true;
         }
         if start {
-            temp_method.push_str(line.trim());
+            temp_method.push_str(format!(" {}", line.trim()).as_str());
             let last_char = match temp_method.chars()
                 .nth(temp_method.len() - 1) {
                     Some(chr) => chr,
@@ -127,7 +131,7 @@ pub fn extract_methods(class_code: Vec<String>) -> Vec<Method> {
 
             if last_char == ENDEF_KEYWORD {
                 methods.push(Method::new(&temp_method));
-                temp_method = String::from("");
+                temp_method = String::new();
                 start = false;
             }
         }

@@ -11,6 +11,7 @@ Copyright 2021 Vlad Nedelcu
 pub mod utils;
 pub mod objects;
 pub mod display;
+pub mod markers;
 
 use std::fs;
 use std::path::PathBuf;

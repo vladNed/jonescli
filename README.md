@@ -53,3 +53,27 @@ This will search for the class tool in the current directory on which you called
 ```bash
 $ jones Tool ~/band_project
 ```
+
+Output:
+```bash
+# Class :: [Board]
+
+Tic Tac Toe board
+
+* inherit -> Tool
+
+# Methods
+-------
+:: [__init__] -> None
+  * self: None
+:: [__getitem__] -> ndarray
+  * self: None
+  * x: int
+:: [display] -> None
+  * self: None
+:: [mark] -> None
+  * self: None
+  * tag: Markers
+  * x: int
+  * y: int
+```

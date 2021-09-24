@@ -10,9 +10,9 @@ Copyright 2021 Vlad Nedelcu
 
 use regex::Regex;
 
-static OPEN_PARANTHESES: char = '[';
-static CLOSE_PARANTHESES: char = ']';
-static COMMA: char = ',';
+const OPEN_PARANTHESES: char = '[';
+const CLOSE_PARANTHESES: char = ']';
+const COMMA: char = ',';
 
 
 /// Fetch the arguments from a class method and mark the commas
@@ -28,10 +28,9 @@ pub fn get_header_arguments(header: &String) -> Option<String> {
         .filter(|&entry| !entry.is_empty())
         .collect();
 
-    if segments.len() == 0 {
-        None
-    } else {
-        Some(mark_commas_for_split(segments[0]))
+    match segments.len() {
+        0 => None,
+        _ => Some(mark_commas_for_split(segments[0]))
     }
 }
 
@@ -46,14 +45,15 @@ fn mark_commas_for_split(args: &str) -> String {
     let mut marked_args = args.to_string();
 
     for (pos, ch) in args.chars().enumerate() {
-        if ch == OPEN_PARANTHESES {
-            inside_brackets = true;
-            continue
-        } else if ch == CLOSE_PARANTHESES {
-            inside_brackets = false;
-            continue
-        } else if inside_brackets && ch == COMMA {
-            marked_args.remove(pos+1);
+        match ch {
+            OPEN_PARANTHESES => inside_brackets = true,
+            CLOSE_PARANTHESES => inside_brackets = false,
+            COMMA => {
+                if inside_brackets {
+                    marked_args.remove(pos+1);
+                }
+            },
+            _ => continue
         }
     }
 

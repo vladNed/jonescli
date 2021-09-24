@@ -218,8 +218,6 @@ pub fn extract_class_inheritance(line: &String) -> Option<Vec<String>> {
     Some(class_inheritance)
 }
 
-
-
 #[cfg(test)]
 mod tests {
     use super::*;

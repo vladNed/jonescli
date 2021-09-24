@@ -77,28 +77,25 @@ impl fmt::Display for Method{
 pub struct PythonClass{
     pub name: String,
     pub methods: Vec<Method>,
-    pub inheritance: Vec<String>
+    pub inheritance: Vec<String>,
+    pub docstring: String
 }
 impl PythonClass {
-    pub fn new(class_code: Vec<String>, name: String, inheritance: Vec<String>) -> Self {
+    pub fn new(class_code: Vec<String>, name: String, inheritance: Vec<String>, docstring: String) -> Self {
         PythonClass {
             name: name,
             methods: utils::extract_methods(class_code),
-            inheritance
+            inheritance,
+            docstring
         }
     }
 }
 impl fmt::Display for PythonClass{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut inheritance_display = String::from("");
-        inheritance_display.push_str("[");
-        for object in self.inheritance.iter() {
-            inheritance_display.push_str(object);
-            inheritance_display.push_str(", ");
-        }
-        inheritance_display.push_str("]");
-        write!(f, "# Class :: [{}]\n* inherit -> {}\n\n# Methods\n-------",
+        let inheritance_display = self.inheritance.join(", ");
+        write!(f, "# Class :: [{}]\n{}\n* inherit -> {}\n\n# Methods\n-------",
             Colour::Cyan.paint(&self.name),
+            Colour::Yellow.paint(&self.docstring),
             Colour::Green.paint(inheritance_display)
         )
     }

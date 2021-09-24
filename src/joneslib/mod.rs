@@ -12,6 +12,7 @@ pub mod utils;
 pub mod objects;
 pub mod display;
 pub mod markers;
+pub mod docstrings;
 
 use std::fs;
 use std::path::PathBuf;
@@ -19,6 +20,9 @@ use std::path::PathBuf;
 static CLASS_KEYWORD: &str = "class {template}";
 static TEMPLATE_KEYWORD: &str = "{template}";
 static PYTHON_EXTENSION: &str = "py";
+static DOCSTRING: &str = "\"\"\"";
+static NEWLINE: &str = "\n";
+
 
 type ClassMatch = (String, String);
 
@@ -46,7 +50,8 @@ fn extract_python_class(code_lines: Vec<&str>, class_name: &str) -> objects::Pyt
         }
         if start_cutting {
             class_code_block.push(line.to_string());
-            if line.is_empty() && code_lines[counter-1].is_empty() {
+
+            if line.len() <= 1 && code_lines[counter-1].len() <= 1 {
                 break
             }
         }
@@ -57,7 +62,12 @@ fn extract_python_class(code_lines: Vec<&str>, class_name: &str) -> objects::Pyt
         None => Vec::new()
     };
 
-    objects::PythonClass::new(class_code_block, class_name.to_string(), class_inheritance)
+    let docstring = match docstrings::extract_docstring(&class_code_block) {
+        Some(inheritance_vec) => inheritance_vec,
+        None => String::from("None")
+    };
+
+    objects::PythonClass::new(class_code_block, class_name.to_string(), class_inheritance, docstring)
 }
 
 /// Check if a file contains the searched class by reading the file.
@@ -188,7 +198,7 @@ mod tests {
 
     static PYTHON_CODE: &str = "
     class God:
-
+        \"\"\"DocString\"\"\"
         def __init__(self, name: int):
             self.name == name
 
@@ -211,6 +221,7 @@ mod tests {
 
         let test_codebase = vec![
             "class God:".to_string(),
+            "    \"\"\"DocString\"\"\"".to_string(),
             "".to_string(),
             "    def __init__(self, name: int):".to_string(),
             "        self.name = name".to_string(),
@@ -221,7 +232,7 @@ mod tests {
         ];
         let lines: Vec<&str> = PYTHON_CODE.split("\n").collect();
 
-        let expected_class = PythonClass::new(test_codebase, String::from("God"), Vec::new());
+        let expected_class = PythonClass::new(test_codebase, String::from("God"), Vec::new(), String::from("DocString"));
 
         assert_eq!(extract_python_class(lines, "God"), expected_class);
 
@@ -252,6 +263,7 @@ mod tests {
 
         let test_codebase = vec![
             "class God:".to_string(),
+            "    \"\"\"DocString\"\"\"".to_string(),
             "".to_string(),
             "    def __init__(self, name: int):".to_string(),
             "        self.name = name".to_string(),
@@ -261,7 +273,7 @@ mod tests {
             "".to_string()
         ];
 
-        let expected_class = PythonClass::new(test_codebase, String::from("God"), Vec::new());
+        let expected_class = PythonClass::new(test_codebase, String::from("God"), Vec::new(), String::from("DocString"));
         assert_eq!(expected_class, project_traversal(&pathbuf, &"God".to_string()).unwrap());
 
         fs::remove_dir_all("./testing").expect("Could not delete dir");

@@ -17,11 +17,12 @@ pub mod docstrings;
 use std::fs;
 use std::path::PathBuf;
 
-static CLASS_KEYWORD: &str = "class {template}";
-static TEMPLATE_KEYWORD: &str = "{template}";
-static PYTHON_EXTENSION: &str = "py";
-static DOCSTRING: &str = "\"\"\"";
-static NEWLINE: &str = "\n";
+const CLASS_TEMPLATE_INHERITANCE: &str = "class {template}(";
+const CLASS_TEMPLATE: &str = "class {template}:";
+const TEMPLATE_KEYWORD: &str = "{template}";
+const PYTHON_EXTENSION: &str = "py";
+const DOCSTRING: &str = "\"\"\"";
+const NEWLINE: &str = "\n";
 
 
 type ClassMatch = (String, String);
@@ -36,7 +37,9 @@ type ClassMatch = (String, String);
 /// * `class_name`: The searched class name
 ///
 fn extract_python_class(code_lines: Vec<&str>, class_name: &str) -> objects::PythonClass {
-    let full_class_name = CLASS_KEYWORD.clone()
+    let class_name_inheritance = CLASS_TEMPLATE_INHERITANCE.clone()
+        .replace(TEMPLATE_KEYWORD, class_name);
+    let class_name_simple = CLASS_TEMPLATE.clone()
         .replace(TEMPLATE_KEYWORD, class_name);
 
     let mut start_cutting: bool = false;
@@ -44,7 +47,7 @@ fn extract_python_class(code_lines: Vec<&str>, class_name: &str) -> objects::Pyt
     let mut class_header: String = String::from("");
 
     for (counter, line) in code_lines.iter().enumerate() {
-        if line.contains(&full_class_name) {
+        if line.contains(&class_name_inheritance) || line.contains(&class_name_simple) {
             start_cutting = true;
             class_header.push_str(line)
         }
@@ -79,12 +82,16 @@ fn extract_python_class(code_lines: Vec<&str>, class_name: &str) -> objects::Pyt
 /// # Errors
 /// It panics if the file is cannot be read properly
 fn check_file_contains_class(class_name: &str, file_path: &str) -> bool {
-    let full_class_name = CLASS_KEYWORD.clone()
+    let class_name_inheritance = CLASS_TEMPLATE_INHERITANCE.clone()
+        .replace(TEMPLATE_KEYWORD, class_name);
+    let class_name = CLASS_TEMPLATE.clone()
         .replace(TEMPLATE_KEYWORD, class_name);
 
     match fs::read_to_string(file_path) {
         Ok(file_content) => {
-            return file_content.contains(&full_class_name)
+            let first_check = file_content.contains(&class_name_inheritance);
+            let second_check = file_content.contains(&class_name);
+            return first_check || second_check
         },
         Err(_) => {
             return false
@@ -92,7 +99,8 @@ fn check_file_contains_class(class_name: &str, file_path: &str) -> bool {
     };
 }
 
-/// Searches recurssively through a project for a Python class
+/// Searches recurssively through a project for a Python class and extracts that
+/// class into an PythonClass struct.
 pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<objects::PythonClass> {
     let current_dir = match fs::read_dir(dir_path) {
         Ok(dir) => dir,

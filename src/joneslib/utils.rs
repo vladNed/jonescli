@@ -30,10 +30,9 @@ static CLASS_KEYWORD: &str = "class ";
 /// * `value`: value to split
 fn regex_split<'a>(r: &'a str, trim: bool, value: &'a String) -> Vec<&'a str> {
     let regex_separator = Regex::new(r).expect("Invalid regex function given");
-    if trim {
-        regex_separator.split(value.trim()).collect()
-    } else {
-        regex_separator.split(value).collect()
+    match trim {
+        true => regex_separator.split(value.trim()).collect(),
+        false => regex_separator.split(value).collect()
     }
 }
 
@@ -152,13 +151,8 @@ pub fn extract_methods(class_code: Vec<String>) -> Vec<Method> {
 pub fn extract_method_output(header: &String) -> Result<String, &str> {
     let header_split = regex_split(r"( -> )", true, header);
     match header_split.len() {
-        1 => {
-            return Err("Output type not found")
-        },
-        _ => {
-            let cleaned_output = header_split[1].trim().replace(":", "");
-            return Ok(cleaned_output)
-        }
+        1 => Err("Output type not found"),
+        _ => Ok(header_split[1].trim().replace(":", ""))
     }
 }
 
@@ -181,10 +175,9 @@ pub fn grep_class<'a>(lines: Vec<&str>, keyword: &String, file_name: &str) -> Op
             );
         }
     }
-    if found_match_classes.len() > 0 {
-        Some(found_match_classes)
-    } else {
-        None
+    match found_match_classes.len() {
+        0 => Some(found_match_classes),
+        _ => None
     }
 }
 

@@ -121,8 +121,13 @@ pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<obje
                 None => continue
             };
         } else {
-            if file_path.extension().unwrap() != PYTHON_EXTENSION {
-                continue
+            match file_path.extension() {
+                Some(extension) => {
+                    if extension != PYTHON_EXTENSION {
+                        continue
+                    }
+                },
+                None => continue
             }
             if check_file_contains_class(class_name, &file_path_name){
                 let file_content = match fs::read_to_string(file_path) {

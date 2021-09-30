@@ -1,6 +1,6 @@
 [package]
 name = "jones"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Vlad Nedelcu <vlad.nedelcu@evozon.com>"]
 license = "MIT"
 edition = "2018"

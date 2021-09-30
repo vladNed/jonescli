@@ -176,8 +176,8 @@ pub fn grep_class<'a>(lines: Vec<&str>, keyword: &String, file_name: &str) -> Op
         }
     }
     match found_match_classes.len() {
-        0 => Some(found_match_classes),
-        _ => None
+        0 => None,
+        _ => Some(found_match_classes)
     }
 }
 

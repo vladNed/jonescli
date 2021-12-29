@@ -1,4 +1,4 @@
-use super::{DOCSTRING, NEWLINE};
+use super::{DOCSTRING, NEWLINE, INIT_DEF};
 
 
 pub fn extract_docstring(code_block: &Vec<String>) -> Option<String> {
@@ -22,6 +22,8 @@ fn get_docstring(code_block: &Vec<String>) -> Option<Vec<String>> {
                 2 => break,
                 _ => continue
             }
+        } else if line.contains(INIT_DEF) {
+            break
         }
 
         if start_docstring {
@@ -102,5 +104,19 @@ mod tests {
 
         assert_eq!(extract_docstring(&test_code_block), Some(expected.join(NEWLINE)));
 
+    }
+
+    #[test]
+    fn test_extract_docstring_none(){
+        let test_code_block: Vec<String> = vec![
+            "class God:".to_string(),
+            "".to_string(),
+            "    def __init__(self, name: int):".to_string(),
+            "        \"\"\"Docstring test\"\"\"".to_string(),
+            "        self.name = name".to_string(),
+            "".to_string()
+        ];
+
+        assert_eq!(extract_docstring(&test_code_block), None);
     }
 }

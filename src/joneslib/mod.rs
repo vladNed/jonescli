@@ -23,6 +23,7 @@ const TEMPLATE_KEYWORD: &str = "{template}";
 const PYTHON_EXTENSION: &str = "py";
 const DOCSTRING: &str = "\"\"\"";
 const NEWLINE: &str = "\n";
+const INIT_DEF: &str = "def __init__";
 
 
 type ClassMatch = (String, String);

@@ -50,7 +50,10 @@ pub fn load_python_object(file_path: &PathBuf, class_name: &String) -> Option<Py
     let methods_pattern = Regex::new(METHODS_PATTERN).unwrap();
     let attributes_pattern = Regex::new(ATTRIBUTES_PATTERN).unwrap();
     let class_pattern = Regex::new(CLASS_NAME_PATTERN).unwrap();
-    let docstring_pattern = RegexBuilder::new(DOCSTRING_PATTERN).dot_matches_new_line(true).build().unwrap();
+    let docstring_pattern = RegexBuilder::new(DOCSTRING_PATTERN)
+        .dot_matches_new_line(true)
+        .build()
+        .unwrap();
     let inheritance_pattern = Regex::new(INHERITANCE_PATTERN).unwrap();
     let output_pattern = Regex::new(OUTPUT_PATTERN).unwrap();
 

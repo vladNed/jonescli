@@ -26,7 +26,10 @@ impl Parameter {
             static_type.clone()
         };
 
-        Parameter { name, static_type: annotation }
+        Parameter {
+            name,
+            static_type: annotation,
+        }
     }
 }
 impl fmt::Display for Parameter {

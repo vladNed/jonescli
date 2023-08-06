@@ -56,10 +56,9 @@ $ jones Tool ~/band_project
 
 Output:
 ```bash
-# Class :: [Board]
-
-Tic Tac Toe board
-
+# Class [Board]
+-------
+*docstring: Tic Tac Toe board
 * inherit -> Tool
 
 # Methods

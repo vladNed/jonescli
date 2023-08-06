@@ -1,6 +1,6 @@
 [package]
 name = "jones"
-version = "0.1.4"
+version = "0.2.0"
 authors = ["Vlad Nedelcu <vlad.nedelcu@evozon.com>"]
 license = "MIT"
 edition = "2018"
@@ -12,6 +12,7 @@ categories = ["command-line-utilities"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+walkdir = "2.3.1"
 regex = "1.5.5"
 ansi_term = "0.12.1"
 structopt = "0.3.13"

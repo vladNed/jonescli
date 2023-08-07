@@ -11,15 +11,30 @@ This project is a pathfinder/inspector for Python classes. A very minimal implem
 It aims to help you find classes without changing files or view to understand classes and it shows you the methods and arguments of it very
 beautiful in the terminal
 
-# Usage
+# Installation
 
-Obviously for better understanding of `jones` capabilities you can always type:
+Installing `jones` requires having the latest rust and cargo. 
 
+After that, by simply running this command the `jones` CLI would be installed:
 ```bash
-$ jones --help
+cargo install jones
 ```
 
-This will show you all the flags and arguments that jones has
+## Supported Python Projects
+| Version | Supported    |
+| :---:   | :---:        |
+| >=3.5   | True         |
+| ==2.7   | False        |
+
+# Usage
+
+Obviously for a better understanding of `jones` capabilities you can always type:
+
+```bash
+jones --help
+```
+
+This will show you all the flags and arguments that `jones` has
 
 
 ## Search/grep for classes
@@ -29,7 +44,7 @@ The `--grep` flag will find all the Python classes containing a keyword given fo
 For example:
 
 ```bash
-$ jones -g Tool
+jones -g Tool
 ```
 This would return all classes that contain the Tool word and would show you in which files are found exactly as the usual grep.
 
@@ -40,18 +55,18 @@ This would return all classes that contain the Tool word and would show you in w
 ```
 
 > Note: This is still in development as it should be renamed to smart search. The smart search will be used to find classes based on a keyword and the context in which the keyword is used
-## Showing classes features
+## Showing class features
 
 To display the class methods and arguments just use `jones` without any flag. For example:
 
 ```bash
-$ jones Tool
+jones Tool
 ```
 
-This will search for the class tool in the current directory on which you called jones (if the directory path is not specified). If the directory path is specified `jones` will search there. For example:
+This will search for the class tool in the current directory which you called `jones` (if the directory path is not specified). If the directory path is specified `jones` will search there. For example:
 
 ```bash
-$ jones Tool ~/band_project
+jones Tool ~/band_project
 ```
 
 Output:

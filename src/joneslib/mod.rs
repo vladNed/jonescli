@@ -85,8 +85,8 @@ pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<obje
 
 /// Loads the project classes and filters them by the class name. Returns a vector
 /// of tuples containing the class name and the file path.
-pub fn search(dir_path: &PathBuf, class_name: &String) -> Option<Vec<ClassMatch>> {
-    let project_classes = match loader::load_python_project(dir_path) {
+pub fn search(path: &PathBuf, class_name: &String) -> Option<Vec<ClassMatch>> {
+    let project_classes = match loader::load_python_project(path) {
         Some(classes) => classes,
         None => {
             println!("Error occurred while loading project classes");

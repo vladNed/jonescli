@@ -22,14 +22,22 @@ static INHERITANCE_PATTERN: &str = r"<Inherit>\s\[(.*?)\]";
 static OUTPUT_PATTERN: &str = r"<Output> (\w+)";
 
 /// Loads all objects from a Python project, given through the python project path.
-pub fn load_python_project(project_path: &PathBuf) -> Option<Vec<(String, String)>> {
+pub fn load_python_project(path: &PathBuf) -> Option<Vec<(String, String)>> {
     let class_name_pattern = Regex::new(CLASS_NAME_PATTERN).unwrap();
     let file_name_pattern = Regex::new(FILE_NAME_PATTERN).unwrap();
 
-    let script_output = match run_python_script(&project_path) {
-        Some(output) => String::from_utf8(output).unwrap(),
-        None => return None,
+    let script_output = if path.is_dir() {
+        match run_python_script(&path) {
+            Some(output) => String::from_utf8(output).unwrap(),
+            None => return None,
+        }
+    } else {
+        match run_python_single_file_script(&path) {
+            Some(output) => String::from_utf8(output).unwrap(),
+            None => return None,
+        }
     };
+
 
     let file_pattern_captures = file_name_pattern.captures_iter(&script_output);
     let found_classes = class_name_pattern
@@ -123,6 +131,36 @@ for root, dirs, files in os.walk({:?}):
     let output = Command::new("python").arg("-c").arg(python_script).output();
 
     if let Ok(output) = output {
+        Some(output.stdout)
+    } else {
+        None
+    }
+}
+
+#[inline]
+fn run_python_single_file_script(file_path: &PathBuf) -> Option<Vec<u8>> {
+    let python_script = format!(
+        r#"import ast
+import os
+
+file_name = {:?}
+with open(file_name, "r") as file:
+    tree = ast.parse(file.read())
+
+for node in ast.walk(tree):
+    if not isinstance(node, ast.ClassDef):
+        continue
+
+    class_name = node.name
+    print("<Class> %s, <File> %s" % (class_name, file_name))
+"#,
+        file_path.as_os_str(),
+    );
+
+    let output = Command::new("python").arg("-c").arg(python_script).output();
+
+    if let Ok(output) = output {
+        println!("{}", String::from_utf8(output.stderr).unwrap());
         Some(output.stdout)
     } else {
         None

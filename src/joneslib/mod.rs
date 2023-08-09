@@ -31,7 +31,7 @@ type ClassMatch = (String, String);
 ///
 /// # Errors
 /// It panics if the file is cannot be read properly
-fn check_file_contains_class(class_name: &str, file_path: &str) -> bool {
+fn check_file_contains_class(class_name: &str, file_path: &PathBuf) -> bool {
     let class_name_inheritance = CLASS_TEMPLATE_INHERITANCE
         .clone()
         .replace(TEMPLATE_KEYWORD, class_name);
@@ -49,35 +49,42 @@ fn check_file_contains_class(class_name: &str, file_path: &str) -> bool {
 
 /// Searches recursively through a project for a Python class and extracts that
 /// class into an PythonClass struct.
-pub fn project_traversal(dir_path: &PathBuf, class_name: &String) -> Option<objects::PythonClass> {
+pub fn fetch_object_details(path: &PathBuf, class_name: &String) -> Option<objects::PythonClass> {
+    if path.is_file() && check_file_contains_class(class_name, path) {
+        return loader::load_python_object(path, class_name);
+    }
+
+    recursive_fetch_object(path, class_name)
+}
+
+fn recursive_fetch_object(dir_path: &PathBuf, class_name: &String) -> Option<objects::PythonClass> {
     let current_dir = match fs::read_dir(dir_path) {
         Ok(dir) => dir,
         Err(err) => {
-            println!("Error occured while reading dir: {}", err);
+            println!("Error occurred while reading dir: {}", err);
             return None;
         }
     };
 
     for file in current_dir {
         let file_path = file.unwrap().path();
-        let file_path_name = file_path.to_str().unwrap();
         if file_path.is_dir() {
-            match project_traversal(&file_path, class_name) {
+            match recursive_fetch_object(&file_path, class_name) {
                 Some(value) => return Some(value),
                 None => continue,
             };
-        } else {
-            match file_path.extension() {
-                Some(extension) => {
-                    if extension != PYTHON_EXTENSION {
-                        continue;
-                    }
+        }
+
+        match file_path.extension() {
+            Some(extension) => {
+                if extension != PYTHON_EXTENSION {
+                    continue;
                 }
-                None => continue,
             }
-            if check_file_contains_class(class_name, &file_path_name) {
-                return loader::load_python_object(&file_path, &class_name);
-            }
+            None => continue,
+        }
+        if check_file_contains_class(class_name, &file_path) {
+            return loader::load_python_object(&file_path, &class_name);
         }
     }
     return None;
@@ -104,7 +111,7 @@ pub fn search(path: &PathBuf, class_name: &String) -> Option<Vec<ClassMatch>> {
 
 #[cfg(test)]
 mod tests {
-    use super::project_traversal;
+    use super::fetch_object_details;
     use std::fs;
     use std::path::PathBuf;
 
@@ -143,9 +150,34 @@ mod tests {
         pathbuf.push("./testing_none");
 
         // Assert
-        assert_eq!(project_traversal(&pathbuf, &"TestCode".to_string()), None);
+        assert_eq!(
+            fetch_object_details(&pathbuf, &"TestCode".to_string()),
+            None
+        );
 
         // Destroy the test dir
         fs::remove_dir_all("./testing_none").expect("Could not delete dir");
+    }
+
+    #[test]
+    fn test_fetch_object_given_file_path() {
+        // Paths
+        let test_dir = String::from("./test_fetch_objects");
+        let python_file = String::from("./test_fetch_objects/test.py");
+        let mut pathbuf = PathBuf::new();
+
+        // Create dir and files
+        fs::create_dir(test_dir).expect("Could not write dir");
+        fs::write(python_file, PYTHON_CODE).unwrap();
+        pathbuf.push("./test_fetch_objects/test.py");
+
+        // Assert
+        assert_eq!(
+            fetch_object_details(&pathbuf, &"TestCode".to_string()),
+            None
+        );
+
+        // Destroy the test dir
+        fs::remove_dir_all("./test_fetch_objects").expect("Could not delete dir");
     }
 }

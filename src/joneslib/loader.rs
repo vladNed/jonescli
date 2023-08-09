@@ -38,7 +38,6 @@ pub fn load_python_project(path: &PathBuf) -> Option<Vec<(String, String)>> {
         }
     };
 
-
     let file_pattern_captures = file_name_pattern.captures_iter(&script_output);
     let found_classes = class_name_pattern
         .captures_iter(&script_output)

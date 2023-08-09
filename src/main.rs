@@ -24,7 +24,7 @@ fn main() {
         }
     } else {
         // Generate python class
-        match joneslib::project_traversal(&comms.path, &comms.class_name) {
+        match joneslib::fetch_object_details(&comms.path, &comms.class_name) {
             Some(class) => joneslib::display::output_class(&class),
             None => display::not_found_message(),
         }

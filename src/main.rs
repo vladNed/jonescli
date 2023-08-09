@@ -18,13 +18,13 @@ fn main() {
     let comms = commands::CLI::from_args();
     if comms.grep {
         // Search for a keyword in class name
-        match joneslib::search(&comms.dir_path, &comms.class_name) {
+        match joneslib::search(&comms.path, &comms.class_name) {
             Some(matches) => display::class_matches(matches),
             None => display::not_found_message(),
         }
     } else {
         // Generate python class
-        match joneslib::project_traversal(&comms.dir_path, &comms.class_name) {
+        match joneslib::fetch_object_details(&comms.path, &comms.class_name) {
             Some(class) => joneslib::display::output_class(&class),
             None => display::not_found_message(),
         }

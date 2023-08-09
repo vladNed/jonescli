@@ -3,7 +3,7 @@ use structopt::StructOpt;
 
 #[derive(StructOpt)]
 pub struct CLI {
-    // Flag to search all classes with that value
+    /// Flag to search all classes with that value
     #[structopt(
         short = "g",
         long = "grep",
@@ -11,11 +11,11 @@ pub struct CLI {
     )]
     pub grep: bool,
 
-    // Class name to be fetched
+    /// Class name to be fetched
     #[structopt(help = "Name of the Python class")]
     pub class_name: String,
 
-    // Search directory
+    /// Search path
     #[structopt(parse(from_os_str), default_value = ".", help = "Search directory")]
-    pub dir_path: PathBuf,
+    pub path: PathBuf,
 }
